@@ -4,110 +4,172 @@
 >
   <!-- Header -->
   <div
-    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 z-10"
   >
     <!-- Back button -->
     <a
       href="{% url 'books:detail' slug=book.slug %}"
       class="px-4 py-2 bg-gray-200 rounded-xl text-gray-800 font-medium hover:bg-gray-300 transition"
     >
-      &lt; Back
+      &lt;
     </a>
 
-    <!-- Page indicator -->
-    <span id="pageNumber" class="absolute left-1/2 text-gray-700 font-semibold">
-      1 / {{ book.page_images|length }}
-    </span>
+    <!-- Page Indicator -->
+    <div class="absolute left-1/2 transform -translate-x-1/2">
+      <span id="pageNumber" class="text-gray-700 font-semibold py-2">
+        1 / {{ book.page_images|length }}
+      </span>
+    </div>
 
-    <!-- Navigation -->
-    <div class="flex gap-2">
+    <!-- Navigation + Page Search -->
+    <div class="flex items-center gap-2">
+      <input
+        type="number"
+        id="gotoPageInput"
+        min="1"
+        max="{{ book.page_images|length }}"
+        placeholder="Page"
+        class="pl-4 pr-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-red-500 focus:outline-none w-full md:w-24"
+      />
       <button
-        id="firstBtn"
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-medium transition hover:bg-gray-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-        disabled
+        id="gotoPageBtn"
+        class="px-4 py-2 text-white rounded-xl font-semibold bg-gray-900 hover:bg-gray-500 transition"
       >
-        First
+        Search
       </button>
+
       <button
         id="prevBtn"
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-medium transition hover:bg-gray-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+        class="px-4 py-2 text-white rounded-xl font-semibold transition bg-gray-900 hover:bg-gray-500 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
         disabled
       >
-        Previous
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          class="bi bi-chevron-left"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0"
+          />
+        </svg>
       </button>
+
       <button
         id="nextBtn"
-        class="px-4 py-2 bg-red-600 text-white rounded-xl font-semibold transition hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+        class="px-4 py-2 text-white rounded-xl font-semibold transition bg-gray-900 hover:bg-gray-500 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
       >
-        Next
-      </button>
-      <button
-        id="lastBtn"
-        class="px-4 py-2 bg-red-600 text-white rounded-xl font-semibold transition hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-      >
-        Last
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          fill="currentColor"
+          class="bi bi-chevron-right"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708"
+          />
+        </svg>
       </button>
     </div>
   </div>
 
   <!-- Book Preview -->
-  <div class="flex justify-center">
+  <div class="flex justify-center gap-4 relative">
     <img
-      id="pdfPage"
-      src="{{ book.page_images.0|default:''|add:MEDIA_URL }}"
-      alt="Page 1"
-      class="w-full max-h-[80vh] object-contain rounded-2xl"
+      id="pdfPageLeft"
+      src=""
+      alt="Page Left"
+      class="w-1/2 max-h-[80vh] object-contain rounded-2xl bg-gray-100"
+    />
+    <img
+      id="pdfPageRight"
+      src=""
+      alt="Page Right"
+      class="w-1/2 max-h-[80vh] object-contain rounded-2xl bg-gray-100"
     />
   </div>
 </div>
 
 <script>
-  const pages = {{ book.page_images|safe }};
-  const mediaUrl = "{{ MEDIA_URL }}";
-  let currentPage = 1;
-  const totalPages = pages.length;
+    const pages = {{ book.page_images|safe }};
+    const mediaUrl = "{{ MEDIA_URL }}";
+    let currentPage = 1;
+    const totalPages = pages.length;
 
-  const pdfPage = document.getElementById("pdfPage");
-  const pageNumber = document.getElementById("pageNumber");
-  const firstBtn = document.getElementById("firstBtn");
-  const prevBtn = document.getElementById("prevBtn");
-  const nextBtn = document.getElementById("nextBtn");
-  const lastBtn = document.getElementById("lastBtn");
+    const pdfPageLeft = document.getElementById("pdfPageLeft");
+    const pdfPageRight = document.getElementById("pdfPageRight");
+    const pageNumber = document.getElementById("pageNumber");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const gotoPageInput = document.getElementById("gotoPageInput");
+    const gotoPageBtn = document.getElementById("gotoPageBtn");
 
-  function updatePage() {
-    pdfPage.src = mediaUrl + pages[currentPage - 1];
-    pageNumber.textContent = `${currentPage} / ${totalPages}`;
+    function updatePage() {
+      if (currentPage % 2 === 0) currentPage--;
 
-    firstBtn.disabled = currentPage === 1;
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages;
-    lastBtn.disabled = currentPage === totalPages;
+      pdfPageLeft.src = mediaUrl + pages[currentPage - 1];
+
+      if (currentPage < totalPages) {
+        pdfPageRight.style.display = "block";
+        pdfPageRight.src = mediaUrl + pages[currentPage];
+      } else {
+        pdfPageRight.style.display = "none";
+      }
+
+      pageNumber.textContent = `${currentPage}-${Math.min(currentPage+1, totalPages)} / ${totalPages}`;
+
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage >= totalPages - 1;
+    }
+
+    prevBtn.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage -= 2;
+        if (currentPage < 1) currentPage = 1;
+        updatePage();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentPage < totalPages) {
+        currentPage += 2;
+        updatePage();
+      }
+    });
+
+    gotoPageBtn.addEventListener("click", () => {
+      let page = parseInt(gotoPageInput.value);
+      if (!isNaN(page) && page >= 1 && page <= totalPages) {
+        currentPage = page;
+        updatePage();
+      } else {
+        alert(`Page must be between 1 and ${totalPages}`);
+      }
+    });
+
+    gotoPageInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // mencegah submit form
+      goToPage();
+    }
+  });
+
+  function goToPage() {
+    let page = parseInt(gotoPageInput.value);
+    if (!isNaN(page) && page >= 1 && page <= totalPages) {
+      currentPage = page;
+      updatePage();
+    } else {
+      alert(`Page must be between 1 and ${totalPages}`);
+    }
   }
 
-  firstBtn.addEventListener("click", () => {
-    currentPage = 1;
     updatePage();
-  });
-
-  prevBtn.addEventListener("click", () => {
-    if (currentPage > 1) {
-      currentPage--;
-      updatePage();
-    }
-  });
-
-  nextBtn.addEventListener("click", () => {
-    if (currentPage < totalPages) {
-      currentPage++;
-      updatePage();
-    }
-  });
-
-  lastBtn.addEventListener("click", () => {
-    currentPage = totalPages;
-    updatePage();
-  });
-
-  updatePage();
 </script>
 {% endblock %}

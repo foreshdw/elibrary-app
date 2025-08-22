@@ -18,10 +18,10 @@
       <div class="mb-2"><b>Name:</b> {{ request.user.username }}</div>
       <div class="mb-2"><b>Email:</b> {{ request.user.email }}</div>
       <div class="flex gap-4 mt-4">
-        <a href="{% url 'users:edit_profile' %}" class="px-4 py-2 bg-red-600 hover:bg-red-800 text-white rounded-xl font-semibold">
+        <a href="{% url 'users:edit_profile' %}" class="px-4 py-2 bg-gray-900 hover:bg-gray-500 text-white rounded-xl font-semibold">
           Edit Profile
         </a>
-        <a href="{% url 'users:password_change' %}" class="px-4 py-2 bg-black hover:bg-gray-800 text-white rounded-xl font-semibold">
+        <a href="{% url 'users:password_change' %}" class="px-4 py-2 bg-red-600 hover:bg-red-800 text-white rounded-xl font-semibold">
           Change Password
         </a>
       </div>
