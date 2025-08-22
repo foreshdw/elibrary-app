@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{% block title %}E-Library{% endblock %}</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Poppins", "ui-sans-serif", "system-ui"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="min-h-screen bg-gray-100 text-gray-800 font-sans bg-[url('/static/images/bg.jpg')] bg-cover bg-center relative pt-4"
+  >
+    <!-- Gradient overlay -->
+    <div
+      class="absolute inset-0 bg-gradient-to-b from-red-700/40 via-red-800/30 to-black/50 -z-10 backdrop-blur-sm"
+    ></div>
+
+    <!-- Navbar -->
+    <nav
+      class="mx-auto w-[90%] max-w-8xl bg-gradient-to-r from-red-600 via-red-800 to-black/90 backdrop-blur-md text-white px-8 py-3 rounded-2xl shadow-lg"
+    >
+      <div class="flex items-center justify-between">
+        <!-- Logo -->
+        <a
+          href="{% url 'books:catalog' %}"
+          class="text-lg font-bold tracking-wide hover:text-gray-200"
+        >
+          📚 E-Library
+        </a>
+
+        <!-- Menu -->
+        <div class="flex items-center space-x-6">
+          <a
+            href="{% url 'books:catalog' %}"
+            class="hover:text-gray-200 font-medium"
+            >Catalog</a
+          >
+          <a
+            href="{% url 'books:upload' %}"
+            class="hover:text-gray-200 font-medium"
+            >Upload</a
+          >
+        </div>
+
+        <!-- Profile + Logout -->
+        <div class="flex items-center space-x-3">
+          <a
+            href="{% url 'users:profile' %}"
+            class="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-xl font-semibold"
+            >Profile</a
+          >
+
+          <form action="{% url 'users:logout' %}" method="post" class="inline">
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="px-4 py-2 bg-red-600 hover:bg-red-800 rounded-xl font-semibold"
+            >
+              Logout
+            </button>
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="mx-auto py-4 max-w-8xl w-[90%]">
+      {% block content %}{% endblock %}
+    </main>
+  </body>
+</html>

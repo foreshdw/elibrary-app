@@ -1,0 +1,102 @@
+{% extends "base.html" %} {% block content %}
+
+<div class="max-w-8xl mx-auto">
+  <!-- Card -->
+  <div class="bg-white rounded-2xl shadow-lg p-8 space-y-6 shadow-2xl">
+    <a
+      href="{% url 'users:profile' %}"
+      class="px-4 py-2 bg-gray-200 rounded-xl text-gray-800 font-medium hover:bg-gray-300 transition"
+    >
+      &lt; Back
+    </a>
+    <h1 class="text-2xl font-bold text-gray-800 text-center">Edit Profile</h1>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+
+      <!-- Foto -->
+      <div class="flex flex-col items-center relative">
+        <input
+          type="file"
+          name="avatar"
+          id="avatarInput"
+          class="hidden"
+          onchange="previewAvatar(event)"
+        />
+
+        <label for="avatarInput" class="cursor-pointer relative">
+          {% if profile.avatar %}
+          <img
+            id="avatarPreview"
+            src="{{ profile.avatar.url }}"
+            class="w-32 h-32 rounded-full object-cover shadow-md"
+            alt="Avatar"
+          />
+          {% else %}
+          <div
+            id="avatarPreview"
+            class="w-32 h-32 flex items-center justify-center rounded-full bg-gray-200 text-gray-500"
+          >
+            <span class="text-sm">No Photo</span>
+          </div>
+          {% endif %}
+          <!-- Overlay icon -->
+          <div
+            class="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full opacity-0 hover:opacity-100 transition"
+          >
+            <span class="text-white text-sm font-semibold">Change</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- Username -->
+      <div class="flex flex-col">
+        <label class="mb-1 text-gray-700 font-medium">Username</label>
+        <input
+          type="text"
+          name="username"
+          value="{{ user.username }}"
+          class="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-600"
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="flex flex-col">
+        <label class="mb-1 text-gray-700 font-medium">Email</label>
+        <input
+          type="email"
+          name="email"
+          value="{{ user.email }}"
+          class="px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-red-600"
+        />
+      </div>
+
+      <!-- Tombol -->
+      <button
+        type="submit"
+        class="w-full py-3 bg-gradient-to-r bg-red-600 hover:bg-red-800 text-white font-semibold rounded-xl shadow hover:shadow-lg transition"
+      >
+        Save
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Preview Avatar -->
+<script>
+  function previewAvatar(event) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      const output = document.getElementById("avatarPreview");
+      if (output.tagName === "IMG") {
+        output.src = reader.result;
+      } else {
+        output.style.backgroundImage = `url(${reader.result})`;
+        output.innerHTML = "";
+      }
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+</script>
+
+{% endblock %}

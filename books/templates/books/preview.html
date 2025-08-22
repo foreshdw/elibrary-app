@@ -1,0 +1,113 @@
+{% extends "base.html" %} {% block content %}
+<div
+  class="pt-6 pb-10 mx-auto px-8 bg-white rounded-3xl shadow-2xl space-y-6 max-w-8xl relative"
+>
+  <!-- Header -->
+  <div
+    class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+  >
+    <!-- Back button -->
+    <a
+      href="{% url 'books:detail' slug=book.slug %}"
+      class="px-4 py-2 bg-gray-200 rounded-xl text-gray-800 font-medium hover:bg-gray-300 transition"
+    >
+      &lt; Back
+    </a>
+
+    <!-- Page indicator -->
+    <span id="pageNumber" class="absolute left-1/2 text-gray-700 font-semibold">
+      1 / {{ book.page_images|length }}
+    </span>
+
+    <!-- Navigation -->
+    <div class="flex gap-2">
+      <button
+        id="firstBtn"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-medium transition hover:bg-gray-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+        disabled
+      >
+        First
+      </button>
+      <button
+        id="prevBtn"
+        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-medium transition hover:bg-gray-300 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+        disabled
+      >
+        Previous
+      </button>
+      <button
+        id="nextBtn"
+        class="px-4 py-2 bg-red-600 text-white rounded-xl font-semibold transition hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+      >
+        Next
+      </button>
+      <button
+        id="lastBtn"
+        class="px-4 py-2 bg-red-600 text-white rounded-xl font-semibold transition hover:bg-red-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+      >
+        Last
+      </button>
+    </div>
+  </div>
+
+  <!-- Book Preview -->
+  <div class="flex justify-center">
+    <img
+      id="pdfPage"
+      src="{{ book.page_images.0|default:''|add:MEDIA_URL }}"
+      alt="Page 1"
+      class="w-full max-h-[80vh] object-contain rounded-2xl"
+    />
+  </div>
+</div>
+
+<script>
+  const pages = {{ book.page_images|safe }};
+  const mediaUrl = "{{ MEDIA_URL }}";
+  let currentPage = 1;
+  const totalPages = pages.length;
+
+  const pdfPage = document.getElementById("pdfPage");
+  const pageNumber = document.getElementById("pageNumber");
+  const firstBtn = document.getElementById("firstBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const lastBtn = document.getElementById("lastBtn");
+
+  function updatePage() {
+    pdfPage.src = mediaUrl + pages[currentPage - 1];
+    pageNumber.textContent = `${currentPage} / ${totalPages}`;
+
+    firstBtn.disabled = currentPage === 1;
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages;
+    lastBtn.disabled = currentPage === totalPages;
+  }
+
+  firstBtn.addEventListener("click", () => {
+    currentPage = 1;
+    updatePage();
+  });
+
+  prevBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      updatePage();
+    }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      updatePage();
+    }
+  });
+
+  lastBtn.addEventListener("click", () => {
+    currentPage = totalPages;
+    updatePage();
+  });
+
+  updatePage();
+</script>
+{% endblock %}

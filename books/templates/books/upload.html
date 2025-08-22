@@ -1,0 +1,178 @@
+{% extends "base.html" %} 
+{% block content %}
+<div class="max-w-8xl mx-auto">
+  <!-- Card -->
+  <div class="bg-white rounded-2xl shadow-lg p-8 space-y-6">
+    <h1 class="text-2xl font-bold text-gray-800 text-center">Upload Book</h1>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4" onsubmit="disableButton(this)">
+      {% csrf_token %}
+
+      <!-- File -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">File (PDF)</label>
+
+        <label
+          for="fileUpload"
+          class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer bg-gray-50 hover:bg-gray-100 transition"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+            class="bi bi-upload" viewBox="0 0 16 16">
+            <path
+              d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+            <path
+              d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708z" />
+          </svg>
+          <p class="text-gray-600 text-sm font-medium mt-2">
+            Click to upload or drag & drop
+          </p>
+          <p class="text-xs text-gray-400">PDF only, max 10MB</p>
+        </label>
+
+        <input
+          id="fileUpload"
+          type="file"
+          name="pdf"
+          accept="application/pdf"
+          required
+          class="hidden"
+          onchange="showFileName(event)"
+        />
+
+        <!-- Preview -->
+        <p id="fileName" class="mt-2 text-sm text-gray-600"></p>
+      </div>
+
+      <!-- Title -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+        <input
+          type="text"
+          name="title"
+          required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:outline-none"
+        />
+      </div>
+
+      <!-- Deskripsi -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+        <textarea
+          name="description"
+          rows="4"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:outline-none"
+        ></textarea>
+      </div>
+
+      <!-- Penulis -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Author</label>
+        <input
+          type="text"
+          name="author"
+          required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:outline-none"
+        />
+      </div>
+
+      <!-- Tahun Terbit -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Tahun Terbit</label>
+        <input
+          type="number"
+          name="year"
+          min="1000"
+          max="2100"
+          required
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-600 focus:outline-none"
+        />
+      </div>
+
+    <!-- Genre -->
+    <div class="relative">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Genre</label>
+      <select
+        name="genre"
+        required
+        class="w-full px-4 pr-10 py-2 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-red-600 focus:outline-none appearance-none"
+      >
+        <option value="" disabled selected>Choose Genre</option>
+        <option value="Fiction">Fiction</option>
+        <option value="Comic">Comic</option>
+        <option value="Motivational">Motivational</option>
+      </select>
+    
+      <!-- Custom arrow -->
+      <div class="absolute inset-y-0 top-7 right-3 flex items-center pointer-events-none">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-gray-500"
+          viewBox="0 0 16 16"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M10 12a1 1 0 0 1-.707-.293l-4-4a1 1 0 1 1 1.414-1.414L10 9.586l3.293-3.293a1 1 0 0 1 1.414 1.414l-4 4A1 1 0 0 1 10 12z"
+            clip-rule="evenodd"
+          />
+        </svg>
+      </div>
+    </div>
+
+      <!-- Tombol Upload -->
+      <button
+      id="uploadBtn"
+        type="submit"
+        class="w-full py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold rounded-xl shadow hover:shadow-lg transition"
+      >
+        Upload
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+function showFileName(event) {
+  const file = event.target.files[0];
+  if (file) {
+    document.getElementById("fileName").textContent = `Selected: ${file.name}`;
+  }
+}
+
+function disableButton(form) {
+  const btn = document.getElementById("uploadBtn");
+  btn.disabled = true;
+  btn.textContent = "Uploading...";
+  btn.classList.add("opacity-70", "cursor-not-allowed");
+}
+
+const dropArea = document.getElementById("fileUpload").previousElementSibling; 
+const fileInput = document.getElementById("fileUpload");
+
+;["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+  dropArea.addEventListener(eventName, (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  });
+});
+
+;["dragenter", "dragover"].forEach(eventName => {
+  dropArea.addEventListener(eventName, () => {
+    dropArea.classList.add("bg-gray-200");
+  });
+});
+;["dragleave", "drop"].forEach(eventName => {
+  dropArea.addEventListener(eventName, () => {
+    dropArea.classList.remove("bg-gray-200");
+  });
+});
+
+dropArea.addEventListener("drop", (e) => {
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    fileInput.files = files;
+    showFileName({ target: fileInput });
+  }
+});
+</script>
+{% endblock %}
